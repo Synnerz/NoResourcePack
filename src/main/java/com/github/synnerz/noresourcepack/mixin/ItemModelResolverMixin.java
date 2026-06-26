@@ -20,20 +20,11 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(ItemModelResolver.class)
 public class ItemModelResolverMixin {
-    @WrapOperation(method = "appendItemLayers", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;"))
+    @WrapOperation(
+            method = { "appendItemLayers", "shouldPlaySwapAnimation", "swapAnimationScale" },
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;")
+    )
     private Object devonian$onAppendItemLayers(ItemStack instance, DataComponentType dataComponentType, Operation<Object> original) {
-        Identifier modelId = (Identifier) original.call(instance, dataComponentType);
-        return ItemsData.INSTANCE.fromModelId(instance, modelId);
-    }
-
-    @WrapOperation(method = "shouldPlaySwapAnimation", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;"))
-    private Object devonian$onShouldPlaySwapAnimation(ItemStack instance, DataComponentType dataComponentType, Operation<Object> original) {
-        Identifier modelId = (Identifier) original.call(instance, dataComponentType);
-        return ItemsData.INSTANCE.fromModelId(instance, modelId);
-    }
-
-    @WrapOperation(method = "swapAnimationScale", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;"))
-    private Object devonian$onSwapAnimationScale(ItemStack instance, DataComponentType dataComponentType, Operation<Object> original) {
         Identifier modelId = (Identifier) original.call(instance, dataComponentType);
         return ItemsData.INSTANCE.fromModelId(instance, modelId);
     }
