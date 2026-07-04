@@ -9,7 +9,7 @@ this mod also allows you to choose between different textures of the resource pa
 /nrp whitelist <skyblockId> - adds a skyblockId to the whitelist of items that you prefer the Hypixel texture over
 
 # Modrinth
-[click here](https://modrinth.com/mod/noresourcepack) (currently under review)
+[click here](https://modrinth.com/mod/noresourcepack)
 
 # Credits
 Massive thanks to the [NEU Repo](https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO) as most of the item's data used by this mod was taken from there
