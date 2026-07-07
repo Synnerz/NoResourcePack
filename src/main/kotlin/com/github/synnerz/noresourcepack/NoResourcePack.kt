@@ -5,10 +5,10 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.mojang.brigadier.arguments.StringArgumentType
 import net.fabricmc.api.ModInitializer
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
-import net.fabricmc.fabric.api.client.command.v2.ClientCommands
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
 import net.minecraft.ChatFormatting
@@ -40,7 +40,7 @@ object NoResourcePack : ModInitializer {
 			)
 		)
 	}
-	val whitelistKeybind = KeyMappingHelper.registerKeyMapping(KeyMapping(
+	val whitelistKeybind = KeyBindingHelper.registerKeyBinding(KeyMapping(
 		"key.noresourcepack.whitelist",
 		GLFW.GLFW_KEY_UNKNOWN,
 		keybindCategory
@@ -52,16 +52,16 @@ object NoResourcePack : ModInitializer {
 		LOGGER.info("Intialized Synnerz/$MOD_ID")
 		ClientCommandRegistrationCallback.EVENT.register { dispatcher, registryAccess ->
 			dispatcher.register(
-				ClientCommands.literal("nrp")
+				ClientCommandManager.literal("nrp")
 					.executes { 1 }
-//					.then(ClientCommands.literal("tooltip").executes { ctx ->
+//					.then(Client_root_ide_package_.net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal("tooltip").executes { ctx ->
 //						vanillaTooltip = !vanillaTooltip
 //						ctx.source.sendFeedback(Component.literal("tooltip $vanillaTooltip"))
 //						1
 //					})
-					.then(ClientCommands.literal("whitelist")
+					.then(ClientCommandManager.literal("whitelist")
 						.then(
-							ClientCommands.argument("skyblockId", StringArgumentType.string())
+							ClientCommandManager.argument("skyblockId", StringArgumentType.string())
 								.executes { ctx ->
 									val sbId = StringArgumentType.getString(ctx, "skyblockId").uppercase()
 									var added = false
@@ -105,7 +105,7 @@ object NoResourcePack : ModInitializer {
 							else
 								added = whitelistedItems.add(sbId)
 
-							minecraft.player!!.sendSystemMessage(
+							minecraft.player!!.displayClientMessage(
 								Component
 									.literal("[NRP] ")
 									.withStyle(Style.EMPTY.withColor(ChatFormatting.RED))
@@ -120,7 +120,8 @@ object NoResourcePack : ModInitializer {
 									.append(Component
 										.literal(sbId)
 										.withStyle(Style.EMPTY.withColor(ChatFormatting.AQUA))
-									)
+									),
+								false
 							)
 						}
 					}
