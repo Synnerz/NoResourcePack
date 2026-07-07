@@ -3,6 +3,9 @@ Hypixel Skyblock added a new forced resource pack, this mod allows you to remove
 
 this mod also allows you to choose between different textures of the resource pack (you must accept the texture pack first for this feature) with a keybind or command to toggle each individual texture for a specific item.
 
+# NOTE
+it currently kicks you from the alpha server if you have the pack requirement disabled
+
 # Commands
 /nrp tooltip - disables the custom tool tip (note that this will only FULLY work if you don't have the texture pack enabled)
 
