@@ -54,11 +54,11 @@ object NoResourcePack : ModInitializer {
 			dispatcher.register(
 				ClientCommands.literal("nrp")
 					.executes { 1 }
-					.then(ClientCommands.literal("tooltip").executes { ctx ->
-						vanillaTooltip = !vanillaTooltip
-						ctx.source.sendFeedback(Component.literal("tooltip $vanillaTooltip"))
-						1
-					})
+//					.then(ClientCommands.literal("tooltip").executes { ctx ->
+//						vanillaTooltip = !vanillaTooltip
+//						ctx.source.sendFeedback(Component.literal("tooltip $vanillaTooltip"))
+//						1
+//					})
 					.then(ClientCommands.literal("whitelist")
 						.then(
 							ClientCommands.argument("skyblockId", StringArgumentType.string())

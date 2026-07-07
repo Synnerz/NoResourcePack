@@ -1,27 +1,52 @@
 package com.github.synnerz.noresourcepack.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.github.synnerz.noresourcepack.NoResourcePack;
 import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
+import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket;
+import net.minecraft.network.protocol.common.ServerboundResourcePackPacket;
+import org.jspecify.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientCommonPacketListenerImpl.class)
 public class ClientCommonPacketListenerImplMixin {
-    @WrapOperation(
+    @Shadow
+    @Final
+    @Nullable
+    protected ServerData serverData;
+
+    @Inject(
             method = "handleResourcePackPush",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/network/protocol/common/ClientboundResourcePackPushPacket;required()Z"
-            )
+            at = @At("HEAD"),
+            cancellable = true
     )
-    private boolean nrp$onResourcePackPush(ClientboundResourcePackPushPacket instance, Operation<Boolean> original) {
-        String url = instance.url();
-        if (!url.startsWith("https://resourcepacks2.hypixel.net/SkyBlockResourcePack")) {
-            return original.call(instance);
+    private void nrp$onPackPush(ClientboundResourcePackPushPacket packet, CallbackInfo ci) {
+        if (
+                !packet.url().contains("SkyBlockResourcePack") ||
+                serverData == null ||
+                serverData.getResourcePackStatus() != ServerData.ServerPackStatus.DISABLED
+        ) {
+            NoResourcePack.INSTANCE.setVanillaTooltip(false);
+            return;
         }
 
-        return false;
+        ClientCommonPacketListenerImpl impl = (ClientCommonPacketListenerImpl) (Object) this;
+
+        impl.send(new ServerboundResourcePackPacket(
+                packet.id(),
+                ServerboundResourcePackPacket.Action.ACCEPTED
+        ));
+        impl.send(new ServerboundResourcePackPacket(
+                packet.id(),
+                ServerboundResourcePackPacket.Action.SUCCESSFULLY_LOADED
+        ));
+        NoResourcePack.INSTANCE.setVanillaTooltip(true);
+
+        ci.cancel();
     }
 }
