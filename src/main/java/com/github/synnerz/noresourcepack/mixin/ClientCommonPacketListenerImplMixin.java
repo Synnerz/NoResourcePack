@@ -27,9 +27,9 @@ public class ClientCommonPacketListenerImplMixin {
     )
     private void nrp$onPackPush(ClientboundResourcePackPushPacket packet, CallbackInfo ci) {
         if (
-                !packet.url().contains("SkyBlockResourcePack") ||
+                !packet.url().contains("resourcepacks.hypixel.net") ||
                 serverData == null ||
-                serverData.getResourcePackStatus() != ServerData.ServerPackStatus.DISABLED
+                serverData.getResourcePackStatus() == ServerData.ServerPackStatus.ENABLED
         ) {
             NoResourcePack.INSTANCE.setVanillaTooltip(false);
             return;
@@ -46,6 +46,7 @@ public class ClientCommonPacketListenerImplMixin {
                 ServerboundResourcePackPacket.Action.SUCCESSFULLY_LOADED
         ));
         NoResourcePack.INSTANCE.setVanillaTooltip(true);
+        System.out.println("disabling texture pack fully " + packet.url());
 
         ci.cancel();
     }
