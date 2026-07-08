@@ -29,7 +29,9 @@ object ItemsData {
 
     fun skyblockId(itemStack: ItemStack): String? {
         val extraAttributes = itemStack.get(DataComponents.CUSTOM_DATA)?.copyTag() ?: return null
-        return extraAttributes.getString("id").getOrNull()
+        val sbId = extraAttributes.getString("id").getOrNull()
+        val isQuiver = extraAttributes.getString("quiver_arrow").isPresent
+        return if (isQuiver && sbId == null) "NRP\$QUIVER" else sbId
     }
 
     fun modelId(itemStack: ItemStack): String? {
