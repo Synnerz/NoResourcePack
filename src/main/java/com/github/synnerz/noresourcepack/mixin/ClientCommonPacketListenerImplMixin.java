@@ -46,7 +46,6 @@ public class ClientCommonPacketListenerImplMixin {
                 ServerboundResourcePackPacket.Action.SUCCESSFULLY_LOADED
         ));
         NoResourcePack.INSTANCE.setVanillaTooltip(true);
-        System.out.println("disabling texture pack fully " + packet.url());
 
         ci.cancel();
     }
