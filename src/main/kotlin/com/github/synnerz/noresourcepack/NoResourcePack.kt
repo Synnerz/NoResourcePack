@@ -31,6 +31,12 @@ object NoResourcePack : ModInitializer {
 			Files.createFile(toPath())
 		}
 	}
+	private val configFile2 = File(mcRoot, "nrptooltipconfig.json").apply {
+		if (!exists()) {
+			Files.createDirectories(parentFile.toPath())
+			Files.createFile(toPath())
+		}
+	}
 	private val gson = Gson()
 	val keybindCategory by lazy {
 		KeyMapping.Category.register(
@@ -54,11 +60,11 @@ object NoResourcePack : ModInitializer {
 			dispatcher.register(
 				ClientCommands.literal("nrp")
 					.executes { 1 }
-//					.then(ClientCommands.literal("tooltip").executes { ctx ->
-//						vanillaTooltip = !vanillaTooltip
-//						ctx.source.sendFeedback(Component.literal("tooltip $vanillaTooltip"))
-//						1
-//					})
+					.then(ClientCommands.literal("tooltip").executes { ctx ->
+						vanillaTooltip = !vanillaTooltip
+						ctx.source.sendFeedback(Component.literal("vanilla tooltip $vanillaTooltip"))
+						1
+					})
 					.then(ClientCommands.literal("whitelist")
 						.then(
 							ClientCommands.argument("skyblockId", StringArgumentType.string())
@@ -134,10 +140,15 @@ object NoResourcePack : ModInitializer {
 		gson.fromJson(data, object : TypeToken<Set<String>>() {})?.let {
 			it.forEach { id -> whitelistedItems.add(id) }
 		}
+		val data2 = configFile2.readText()
+		gson.fromJson(data2, Boolean::class.java)?.let {
+			vanillaTooltip = it
+		}
 
 		// save config
 		ClientLifecycleEvents.CLIENT_STOPPING.register {
 			configFile.writeText(gson.toJson(whitelistedItems))
+			configFile2.writeText(gson.toJson(vanillaTooltip))
 		}
 	}
 }
