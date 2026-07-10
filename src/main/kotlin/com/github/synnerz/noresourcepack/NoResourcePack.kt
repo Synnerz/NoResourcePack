@@ -2,6 +2,8 @@ package com.github.synnerz.noresourcepack
 
 import com.github.synnerz.noresourcepack.mixin.AbstractContainerScreenAccessor
 import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import com.mojang.brigadier.arguments.StringArgumentType
 import net.fabricmc.api.ModInitializer
@@ -25,13 +27,19 @@ object NoResourcePack : ModInitializer {
 	const val MOD_ID: String = "noresourcepack"
 	private val LOGGER = LoggerFactory.getLogger(MOD_ID)
 	private val mcRoot = File("./config")
-	private val configFile = File(mcRoot, "nrpconfig.json").apply {
+	private val configFile = File(mcRoot, "nrp/config.json").apply {
 		if (!exists()) {
 			Files.createDirectories(parentFile.toPath())
 			Files.createFile(toPath())
 		}
 	}
-	private val configFile2 = File(mcRoot, "nrptooltipconfig.json").apply {
+	private val oldConfigFile = File(mcRoot, "nrpconfig.json").apply {
+		if (!exists()) {
+			Files.createDirectories(parentFile.toPath())
+			Files.createFile(toPath())
+		}
+	}
+	private val oldConfigFile2 = File(mcRoot, "nrptooltipconfig.json").apply {
 		if (!exists()) {
 			Files.createDirectories(parentFile.toPath())
 			Files.createFile(toPath())
@@ -53,6 +61,7 @@ object NoResourcePack : ModInitializer {
 	))
 	val whitelistedItems = mutableSetOf<String>()
 	var vanillaTooltip = true
+	var blacklistMode = false
 
 	override fun onInitialize() {
 		LOGGER.info("Intialized Synnerz/$MOD_ID")
@@ -80,7 +89,7 @@ object NoResourcePack : ModInitializer {
 											.literal("[NRP] ")
 											.withStyle(Style.EMPTY.withColor(ChatFormatting.RED))
 											.append(Component
-												.literal("Whitelist ")
+												.literal(if (blacklistMode) "Blacklist " else "Whitelist ")
 												.withStyle(Style.EMPTY.withColor(ChatFormatting.AQUA))
 											)
 											.append(Component
@@ -96,6 +105,11 @@ object NoResourcePack : ModInitializer {
 								}
 						)
 					)
+					.then(ClientCommands.literal("blacklistMode").executes { ctx ->
+						blacklistMode = !blacklistMode
+						ctx.source.sendFeedback(Component.literal("blacklisted mode $blacklistMode"))
+						1
+					})
 			)
 		}
 
@@ -116,7 +130,7 @@ object NoResourcePack : ModInitializer {
 									.literal("[NRP] ")
 									.withStyle(Style.EMPTY.withColor(ChatFormatting.RED))
 									.append(Component
-										.literal("Whitelist ")
+										.literal(if (blacklistMode) "Blacklist " else "Whitelist ")
 										.withStyle(Style.EMPTY.withColor(ChatFormatting.AQUA))
 									)
 									.append(Component
@@ -137,19 +151,36 @@ object NoResourcePack : ModInitializer {
 		}
 
 		// load config
-		val data = configFile.readText()
-		gson.fromJson(data, object : TypeToken<Set<String>>() {})?.let {
-			it.forEach { id -> whitelistedItems.add(id) }
+		val oldWhitelist = mutableSetOf<String>()
+		var oldVanillaTooltip = false
+
+		gson.fromJson(oldConfigFile.readText(), object : TypeToken<Set<String>>() {})?.let {
+			oldWhitelist.addAll(it)
 		}
-		val data2 = configFile2.readText()
-		gson.fromJson(data2, Boolean::class.java)?.let {
-			vanillaTooltip = it
+		gson.fromJson(oldConfigFile2.readText(), Boolean::class.java)?.let {
+			oldVanillaTooltip = it
+		}
+		gson.fromJson(configFile.readText(), object : TypeToken<Map<String, Any>>() {}).let { map ->
+            val tooltip = map?.get("vanillaTooltip") as? Boolean ?: oldVanillaTooltip
+			val list = (map?.get("whitelist") as? ArrayList<String>)?.toSet() ?: oldWhitelist
+			val bl = map?.get("blacklistMode") as? Boolean ?: false
+
+			whitelistedItems.addAll(list)
+			vanillaTooltip = tooltip
+			blacklistMode = bl
 		}
 
 		// save config
 		ClientLifecycleEvents.CLIENT_STOPPING.register {
-			configFile.writeText(gson.toJson(whitelistedItems))
-			configFile2.writeText(gson.toJson(vanillaTooltip))
+			val obj = JsonObject()
+
+			obj.addProperty("vanillaTooltip", vanillaTooltip)
+			obj.addProperty("blacklistMode", blacklistMode)
+			obj.add("whitelist", JsonArray().apply {
+				whitelistedItems.forEach { add(it) }
+			})
+
+			configFile.writeText(gson.toJson(obj))
 		}
 	}
 }
