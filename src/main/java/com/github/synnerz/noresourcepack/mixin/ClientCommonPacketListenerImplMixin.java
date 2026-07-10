@@ -26,14 +26,12 @@ public class ClientCommonPacketListenerImplMixin {
             cancellable = true
     )
     private void nrp$onPackPush(ClientboundResourcePackPushPacket packet, CallbackInfo ci) {
-        if (
-                !packet.url().contains("resourcepacks.hypixel.net") ||
-                serverData == null ||
-                serverData.getResourcePackStatus() == ServerData.ServerPackStatus.ENABLED
-        ) {
+        if (!packet.url().contains("resourcepacks.hypixel.net")) {
             NoResourcePack.INSTANCE.setVanillaTooltip(false);
             return;
         }
+        if (serverData == null || serverData.getResourcePackStatus() == ServerData.ServerPackStatus.ENABLED)
+            return;
 
         ClientCommonPacketListenerImpl impl = (ClientCommonPacketListenerImpl) (Object) this;
 
