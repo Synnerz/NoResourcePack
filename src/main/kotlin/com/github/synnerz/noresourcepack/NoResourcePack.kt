@@ -105,7 +105,7 @@ object NoResourcePack : ModInitializer {
 								}
 						)
 					)
-					.then(ClientCommands.literal("blacklistMode").executes { ctx ->
+					.then(ClientCommandManager.literal("blacklistMode").executes { ctx ->
 						blacklistMode = !blacklistMode
 						ctx.source.sendFeedback(Component.literal("blacklisted mode $blacklistMode"))
 						1
