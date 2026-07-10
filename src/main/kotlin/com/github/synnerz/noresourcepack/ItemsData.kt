@@ -10,7 +10,6 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.Items
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -53,8 +52,8 @@ object ItemsData {
         val sbId = skyblockId(itemStack) ?: return modelId
         if (NoResourcePack.whitelistedItems.contains(sbId)) return modelId
 
-        if (itemStack.item == Items.PAPER) {
-            val cache = itemIds[sbId] ?: return modelId
+        val cache = itemIds[sbId]
+        if (cache != null) {
             val id = modelId(itemStack) ?: return modelId
             if (id == "minecraft:player_head") {
                 cache["value"]?.let {
