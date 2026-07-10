@@ -39,7 +39,10 @@ object ItemsData {
     }
 
     fun gameProfile(sbId: String): GameProfile? {
-        if (NoResourcePack.whitelistedItems.contains(sbId)) return null
+        if (NoResourcePack.blacklistMode && !NoResourcePack.whitelistedItems.contains(sbId))
+            return null
+        if (NoResourcePack.whitelistedItems.contains(sbId) && !NoResourcePack.blacklistMode)
+            return null
         return cachedItems[sbId]
     }
 
@@ -50,7 +53,10 @@ object ItemsData {
         if (modelId == null) return null
         if (!modelId.namespace.startsWith("hypixel_skyblock")) return modelId
         val sbId = skyblockId(itemStack) ?: return modelId
-        if (NoResourcePack.whitelistedItems.contains(sbId)) return modelId
+        if (NoResourcePack.blacklistMode && !NoResourcePack.whitelistedItems.contains(sbId))
+            return modelId
+        if (NoResourcePack.whitelistedItems.contains(sbId) && !NoResourcePack.blacklistMode)
+            return modelId
 
         val cache = itemIds[sbId]
         if (cache != null) {
