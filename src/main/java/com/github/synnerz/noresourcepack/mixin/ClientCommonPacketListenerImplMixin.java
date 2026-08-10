@@ -44,6 +44,7 @@ public class ClientCommonPacketListenerImplMixin {
                 ServerboundResourcePackPacket.Action.SUCCESSFULLY_LOADED
         ));
         NoResourcePack.INSTANCE.setVanillaTooltip(true);
+        NoResourcePack.INSTANCE.setCustomTextureLoaded(false);
 
         ci.cancel();
     }

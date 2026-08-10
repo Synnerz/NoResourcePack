@@ -10,6 +10,7 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -80,6 +81,8 @@ object ItemsData {
             }
             return Identifier.parse(id)
         }
+        if (itemStack.item == Items.PAPER && NoResourcePack.customTextureLoaded)
+            return modelId
 
         return BuiltInRegistries.ITEM.getKey(itemStack.item)
     }

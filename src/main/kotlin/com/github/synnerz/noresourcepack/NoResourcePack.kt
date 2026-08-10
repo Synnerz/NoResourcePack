@@ -62,6 +62,7 @@ object NoResourcePack : ModInitializer {
 	val whitelistedItems = mutableSetOf<String>()
 	var vanillaTooltip = true
 	var blacklistMode = false
+	var customTextureLoaded = true
 
 	override fun onInitialize() {
 		LOGGER.info("Intialized Synnerz/$MOD_ID")
