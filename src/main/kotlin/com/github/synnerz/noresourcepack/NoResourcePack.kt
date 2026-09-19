@@ -18,7 +18,7 @@ import net.minecraft.client.KeyMapping
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.resources.Identifier
-import org.lwjgl.glfw.GLFW
+import org.lwjgl.sdl.SDLKeycode
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.nio.file.Files
@@ -56,7 +56,7 @@ object NoResourcePack : ModInitializer {
 	}
 	val whitelistKeybind = KeyMappingHelper.registerKeyMapping(KeyMapping(
 		"key.noresourcepack.whitelist",
-		GLFW.GLFW_KEY_UNKNOWN,
+		SDLKeycode.SDLK_UNKNOWN,
 		keybindCategory
 	))
 	val whitelistedItems = mutableSetOf<String>()
